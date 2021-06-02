@@ -512,7 +512,8 @@ class Config {
 			'color_picker',
 			'group',
 			'repeater',
-			'flexible_content'
+			'flexible_content',
+			'open_street_map'
 		];
 
 		/**
@@ -943,7 +944,7 @@ class Config {
 				$field_config['type'] = $field_type_name;
 
 				break;
-
+			
 			case 'google_map':
 				$field_type_name = 'ACF_GoogleMap';
 				if ( $this->type_registry->get_type( $field_type_name ) == $field_type_name ) {
@@ -1185,6 +1186,100 @@ class Config {
 					};
 				}
 				break;
+				case 'open_street_map':
+					$field_type_name = 'ACF_OpenStreetMap';
+
+
+					if ( $this->type_registry->get_type( $field_type_name ) == $field_type_name ) {
+						$field_config['type'] = $field_type_name;
+						break;
+					}
+					$markers = [];
+					$markers['typeName'] = 'ACF_OpenStreetMap_Marker';
+					$markers['fields'] = [
+						'latitude'      => [
+							'type'        => 'Float',
+							'description' => __( 'The latitude associated with the marker', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['lat'] ) ? $root['lat'] : null;
+							},
+						],
+						'longitude'     => [
+							'type'        => 'Float',
+							'description' => __( 'The longitude associated with the marker', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['lng'] ) ? $root['lng'] : null;
+							},
+						],
+						'label'     => [
+							'type'        => 'String',
+							'description' => __( 'The label associated with the marker', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['label'] ) ? $root['label'] : null;
+							},
+						],
+						'defaultLabel'     => [
+							'type'        => 'String',
+							'description' => __( 'The default label associated with the marker', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['default_label'] ) ? $root['default_label'] : null;
+							},
+						],
+					]
+					$fields = [
+						'streetAddress' => [
+							'type'        => 'String',
+							'description' => __( 'The street address associated with the map', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['address'] ) ? $root['address'] : null;
+							},
+						],
+						'latitude'      => [
+							'type'        => 'Float',
+							'description' => __( 'The latitude associated with the map', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['lat'] ) ? $root['lat'] : null;
+							},
+						],
+						'longitude'     => [
+							'type'        => 'Float',
+							'description' => __( 'The longitude associated with the map', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['lng'] ) ? $root['lng'] : null;
+							},
+						],
+						'zoom' => [
+							'type'        => 'String',
+							'description' => __( 'The zoom defined with the map', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['zoom'] ) ? $root['zoom'] : null;
+							},
+						],
+						'markers' => [
+							'type'        => ['list_of' => $markers['typeName']],
+							'description' => __( 'The markers associated with the map', 'wp-graphql-acf' ),
+							'resolve'     => function( $root ) {
+								return isset( $root['markers'] ) ? $root['markers'] : null;
+							},
+						],
+					];
+
+					$this->type_registry->register_object_type(
+						$markers['typeName'],
+						[
+							'description' => __( 'Open Street Map Field Markers', 'wp-graphql-acf' ),
+							'fields'      => $markers['fields'],
+						]
+					);
+					$this->type_registry->register_object_type(
+						$field_type_name,
+						[
+							'description' => __( 'Open Street Map Field', 'wp-graphql-acf' ),
+							'fields'      => $fields,
+						]
+					);
+					$field_config['type'] = $field_type_name;
+					break;
 			default:
 				break;
 		}
