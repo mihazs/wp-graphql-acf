@@ -1225,7 +1225,7 @@ class Config {
 								return isset( $root['default_label'] ) ? $root['default_label'] : null;
 							},
 						],
-					]
+					];
 					$fields = [
 						'streetAddress' => [
 							'type'        => 'String',
